@@ -1,3 +1,5 @@
+import {useState} from 'react';
+
 import {Flamegraph} from 'sentry/components/profiling/flamegraph';
 import {FullScreenFlamegraphContainer} from 'sentry/components/profiling/fullScreenFlamegraphContainer';
 import {FlamegraphStateProvider} from 'sentry/utils/profiling/flamegraph/flamegraphStateProvider';
@@ -13,11 +15,13 @@ const eventedProfiles = importProfile(
 );
 
 export const EventedTrace = () => {
+  const [profiles, setProfiles] = useState(eventedProfiles);
+
   return (
     <FlamegraphStateProvider>
       <FlamegraphThemeProvider>
         <FullScreenFlamegraphContainer>
-          <Flamegraph profiles={eventedProfiles} />
+          <Flamegraph onImport={p => setProfiles(p)} profiles={profiles} />
         </FullScreenFlamegraphContainer>
       </FlamegraphThemeProvider>
     </FlamegraphStateProvider>
@@ -29,11 +33,13 @@ const sampledTrace = importProfile(
 );
 
 export const SampledTrace = () => {
+  const [profiles, setProfiles] = useState(sampledTrace);
+
   return (
     <FlamegraphStateProvider>
       <FlamegraphThemeProvider>
         <FullScreenFlamegraphContainer>
-          <Flamegraph profiles={sampledTrace} />
+          <Flamegraph onImport={p => setProfiles(p)} profiles={profiles} />
         </FullScreenFlamegraphContainer>
       </FlamegraphThemeProvider>
     </FlamegraphStateProvider>
@@ -45,11 +51,13 @@ const jsSelfProfile = importProfile(
 );
 
 export const JSSelfProfiling = () => {
+  const [profiles, setProfiles] = useState(jsSelfProfile);
+
   return (
     <FlamegraphStateProvider>
       <FlamegraphThemeProvider>
         <FullScreenFlamegraphContainer>
-          {jsSelfProfile ? <Flamegraph profiles={jsSelfProfile} /> : null}
+          <Flamegraph onImport={p => setProfiles(p)} profiles={profiles} />
         </FullScreenFlamegraphContainer>
       </FlamegraphThemeProvider>
     </FlamegraphStateProvider>
@@ -61,11 +69,13 @@ const typescriptProfile = importProfile(
 );
 
 export const TypescriptProfile = () => {
+  const [profiles, setProfiles] = useState(typescriptProfile);
+
   return (
     <FlamegraphStateProvider>
       <FlamegraphThemeProvider>
         <FullScreenFlamegraphContainer>
-          {typescriptProfile ? <Flamegraph profiles={typescriptProfile} /> : null}
+          <Flamegraph onImport={p => setProfiles(p)} profiles={profiles} />
         </FullScreenFlamegraphContainer>
       </FlamegraphThemeProvider>
     </FlamegraphStateProvider>

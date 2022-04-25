@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useState} from 'react';
 import styled from '@emotion/styled';
 import {Location} from 'history';
 
@@ -19,6 +19,8 @@ import {importProfile, ProfileGroup} from 'sentry/utils/profiling/profile/import
 import {Profile} from 'sentry/utils/profiling/profile/profile';
 import useApi from 'sentry/utils/useApi';
 import useOrganization from 'sentry/utils/useOrganization';
+
+import {ProfileDragDropImportProps} from '../../components/profiling/profileDragDropImport';
 
 type RequestState = 'initial' | 'loading' | 'resolved' | 'errored';
 
@@ -80,6 +82,10 @@ function FlamegraphView(props: FlamegraphViewProps): React.ReactElement {
     };
   }, [props.params.eventId, props.params.projectId, api, organization]);
 
+  const onImport: ProfileDragDropImportProps['onImport'] = useCallback(profileGroup => {
+    setProfiles(profileGroup);
+  }, []);
+
   return (
     <SentryDocumentTitle title={t('Profiling')} orgSlug={organization.slug}>
       <Fragment>
@@ -111,13 +117,13 @@ function FlamegraphView(props: FlamegraphViewProps): React.ReactElement {
                 </Alert>
               ) : requestState === 'loading' ? (
                 <Fragment>
-                  <Flamegraph profiles={LoadingGroup} />
+                  <Flamegraph onImport={onImport} profiles={LoadingGroup} />
                   <LoadingIndicatorContainer>
                     <LoadingIndicator />
                   </LoadingIndicatorContainer>
                 </Fragment>
               ) : requestState === 'resolved' && profiles ? (
-                <Flamegraph profiles={profiles} />
+                <Flamegraph onImport={onImport} profiles={profiles} />
               ) : null}
             </FullScreenFlamegraphContainer>
           </FlamegraphThemeProvider>
