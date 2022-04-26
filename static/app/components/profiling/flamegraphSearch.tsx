@@ -29,8 +29,10 @@ function frameSearch(
   query: string,
   frames: ReadonlyArray<FlamegraphFrame>,
   index: Fuse<FlamegraphFrame>
-): Record<string, FlamegraphFrame> {
+): Record<string, FlamegraphFrame> | null {
   const results = {};
+  let hasMatches = false;
+
   if (isRegExpString(query)) {
     const [_, lookup, flags] = parseRegExp(query) ?? [];
 
@@ -43,6 +45,7 @@ function frameSearch(
         const frame = frames[i];
 
         if (new RegExp(lookup, flags ?? 'g').test(frame.frame.name.trim())) {
+          hasMatches = true;
           results[
             `${
               frame.frame.name +
@@ -62,6 +65,7 @@ function frameSearch(
   const fuseResults = index.search(query);
 
   for (let i = 0; i < fuseResults.length; i++) {
+    hasMatches = true;
     const frame = fuseResults[i];
 
     results[
@@ -73,7 +77,7 @@ function frameSearch(
     ] = frame.item;
   }
 
-  return results;
+  return hasMatches ? results : null;
 }
 
 const numericSort = (
@@ -162,6 +166,25 @@ function FlamegraphSearch({
     },
     [searchIndex, frames, canvasPoolManager, allFrames]
   );
+
+  // On first render, if the search query was not falsy, set the search input and trigger a search.
+  // We use a ref to mark if we already searched to guard against a potential infinite loop when a query
+  // would match no results, thus escaping the search.results check and infinitely triggering a search.
+  const searched = useRef<boolean>(false);
+  useEffect(() => {
+    if (!search.query || search.results || !allFrames.length || searched.current) {
+      return;
+    }
+    searched.current = true;
+
+    dispatchSearch({
+      type: 'set results',
+      payload: {
+        results: frameSearch(search.query, allFrames, searchIndex),
+        query: search.query,
+      },
+    });
+  }, [searchIndex, allFrames]);
 
   const onNextSearchClick = useCallback(() => {
     const frames = memoizedSortFrameResults(search.results);
