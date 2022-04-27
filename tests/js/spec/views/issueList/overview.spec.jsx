@@ -5,6 +5,7 @@ import range from 'lodash/range';
 import {mountWithTheme, shallow} from 'sentry-test/enzyme';
 import {initializeOrg} from 'sentry-test/initializeOrg';
 import {act} from 'sentry-test/reactTestingLibrary';
+import {triggerPress} from 'sentry-test/utils';
 
 import StreamGroup from 'sentry/components/stream/group';
 import GroupStore from 'sentry/stores/groupStore';
@@ -516,8 +517,12 @@ describe('IssueList', function () {
       await tick();
       wrapper.update();
 
-      wrapper.find('IssueListSortOptions DropdownButton').simulate('click');
-      wrapper.find('DropdownItem').at(3).find('MenuItem span').at(1).simulate('click');
+      await act(async () => {
+        triggerPress(wrapper.find('IssueListSortOptions button'));
+        await tick();
+        wrapper.update();
+      });
+      wrapper.find('SelectOption').at(3).simulate('click');
 
       expect(browserHistory.push).toHaveBeenLastCalledWith(
         expect.objectContaining({

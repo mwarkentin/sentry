@@ -23,7 +23,6 @@ import {ConfirmAction, getConfirm, getLabel} from './utils';
 type Props = {
   allInQuerySelected: boolean;
   anySelected: boolean;
-  hasPageFilters: boolean;
   issues: Set<string>;
   multiSelected: boolean;
   onDelete: () => void;
@@ -46,7 +45,6 @@ function ActionSet({
   anySelected,
   multiSelected,
   issues,
-  hasPageFilters,
   onUpdate,
   onShouldConfirm,
   onDelete,
@@ -239,14 +237,7 @@ function ActionSet({
         disabledKeys={disabledMenuItems}
         isDisabled={!anySelected}
       />
-      {hasPageFilters && (
-        <IssueListSortOptions
-          sort={sort}
-          query={query}
-          onSelect={onSortChange}
-          hasPageFilters
-        />
-      )}
+      <IssueListSortOptions sort={sort} query={query} onSelect={onSortChange} />
     </Wrapper>
   );
 }
